@@ -2,32 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+/* Custom global styles */
+html, body {
+  @apply font-sans bg-gray-100 text-gray-800;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+/* Container */
+.container {
+  @apply mx-auto px-4;
+}
+
+/* Responsive container width */
+@media (min-width: 640px) { /* Tailwind's sm breakpoint */
+  .container {
+    @apply max-w-4xl;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+/* Header */
+header {
+  @apply bg-blue-500 text-white py-5 text-center relative;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* Navigation */
+nav {
+  @apply bg-blue-500 text-white text-center py-2;
+}
+
+nav ul {
+  @apply flex justify-center list-none p-0;
+}
+
+nav ul li {
+  @apply mx-2;
+}
+
+nav a {
+  @apply text-white no-underline text-base;
+  transition: color .3s;
+}
+
+nav a:hover {
+  @apply text-yellow-400;
+}
+
+/* Responsive nav */
+@media (max-width: 768px) {
+  header ul {
+    @apply flex-col items-center;
   }
 }
+
+/* Buttons */
+button {
+  @apply bg-blue-500 text-white border-none py-2 px-4 my-2 rounded cursor-pointer text-lg;
+}
+
+button:hover {
+  @apply bg-blue-700;
+}
+
+/* Inputs */
+input[type="text"], input[type="number"], input[type="email"], select {
+  @apply w-full p-2 mt-1 mb-2 rounded border-gray-300;
+}
+
+footer {
+  @apply py-5 mt-5 text-white bg-gray-800 text-center;
+}
+
+@media (max-width: 768px) {
+  header ul {
+    @apply flex-col;
+  }
+}
+
