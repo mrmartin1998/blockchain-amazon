@@ -12,11 +12,14 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body>
+      <body data-theme="mytheme">
         <nav className="nav-container">
           <ul className="nav-list">
             <li className={`nav-item ${isActive("/")}`}>
               <Link href="/" className="nav-link">Home</Link>
+            </li>
+            <li className={`nav-item ${isActive("/account-management")}`}>
+              <Link href="/product" className="nav-link">Products</Link>
             </li>
             <li className={`nav-item ${isActive("/account-management")}`}>
               <Link href="/account-management" className="nav-link">Account Management</Link>
@@ -35,7 +38,7 @@ export default function RootLayout({ children }) {
             </li>
           </ul>
         </nav>
-        <ConnectWallet />
+        <ConnectWallet/>
         {children}
         <footer className="footer">
           <p>&copy; 2024 Web3 Amazon. All rights reserved.</p>

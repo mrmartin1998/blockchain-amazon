@@ -1,4 +1,4 @@
 "use client";
 import { useState } from "react";
 import '../globals.css';
-import { judoSystem, web3 } from "../utils/web3";
+import { web3, Amazon } from '../utils/web3';

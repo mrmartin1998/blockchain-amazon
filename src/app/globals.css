@@ -77,3 +77,16 @@ footer {
   }
 }
 
+.form-container {
+/*
+  max-width: 600px; 
+  margin: 0 auto; 
+*/
+  padding: 20px; 
+}
+
+input[type="text"], input[type="number"], input[type="file"] {
+  width: 100%; 
+  padding: 8px;
+  margin-bottom: 10px; 
+}
