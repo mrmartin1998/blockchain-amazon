@@ -25,26 +25,23 @@ export default function AddProduct() {
         setProduct(prev => ({ ...prev, image: e.target.files[0] }));
     };
 
-    // Define uploadImage function inside the component
     const uploadImage = async (file) => {
-        // Return a placeholder image URL directly
         return "https://via.placeholder.com/150";
     };
 
     const addProduct = async (e) => {
         e.preventDefault();
-
-        // Use the placeholder image directly
+        
         const imageUrl = await uploadImage(product.image);
         const costInWei = web3.utils.toWei(product.cost, 'ether');
-
+    
         try {
             const accounts = await web3.eth.getAccounts();
             if (!await Amazon.methods.isSeller(accounts[0]).call()) {
                 setResponseMessage("You are not authorized to list products.");
                 return;
             }
-
+            
             await Amazon.methods.list(
                 product.name,
                 product.category,
@@ -55,7 +52,7 @@ export default function AddProduct() {
                 product.dimensions,
                 product.weight
             ).send({ from: accounts[0] });
-
+            
             setResponseMessage('Product added successfully!');
         } catch (error) {
             console.error('Error while adding product:', error);

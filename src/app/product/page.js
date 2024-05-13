@@ -8,9 +8,9 @@ const ProductPage = () => {
     const [initialized, setInitialized] = useState(false);
 
     useEffect(() => {
-        const init = async () => {
+        async function init() {
             try {
-                const { web3, Amazon } = await initializeWeb3();
+                const { Amazon } = await initializeWeb3();
                 if (Amazon) {
                     console.log("Contract initialized and web3 is ready.");
                     setInitialized(true);
@@ -20,51 +20,51 @@ const ProductPage = () => {
             } catch (error) {
                 console.error("Web3 initialization error:", error);
             }
-        };
-
+        }
         init();
     }, []);
 
     useEffect(() => {
-        if (initialized) {
-            loadProducts();
-        }
-    }, [initialized]); // Removed filter and sortOrder from dependencies to simplify the example
+        async function loadProducts() {
+            if (initialized) {
+                try {
+                    const count = await Amazon.methods.itemCount().call();
+                    console.log("Total products:", count.toString());
+                    let loadedProducts = [];
 
-    const loadProducts = async () => {
-        try {
-            const count = await Amazon.methods.itemCount().call();
-            console.log(`Total items: ${count}`);
-            let loadedProducts = [];
-
-            for (let i = 1; i <= count; i++) {
-                const item = await Amazon.methods.items(i).call();
-                if (item && item.id !== "0" && item.cost !== "0") { // Ensure valid items are added, checking cost is not zero
-                    loadedProducts.push({
-                        id: item.id,
-                        name: item.name,
-                        imageUrl: item.imageUrl,
-                        category: item.category,
-                        cost: item.cost,
-                        stock: item.stock
-                    });
+                    for (let i = 1; i < count; i++) {
+                        const item = await Amazon.methods.items(i).call();
+                        console.log(`Item ${i}:`, item);
+                        if (item && item.id.toString() !== "0" && item.cost.toString() !== "0") {
+                            loadedProducts.push({
+                                id: item.id,
+                                name: item.name,
+                                imageUrl: item.imageUrl || 'https://via.placeholder.com/150',
+                                category: item.category,
+                                cost: web3.utils.fromWei(item.cost, 'ether'),
+                                stock: item.stock
+                            });
+                        }
+                    }
+                    setProducts(loadedProducts);
+                } catch (error) {
+                    console.error('Error loading products:', error);
                 }
             }
-
-            setProducts(loadedProducts);
-        } catch (error) {
-            console.error('Error loading products:', error);
         }
-    };
+        loadProducts();
+    }, [initialized]);
 
     const buyProduct = async (id) => {
         try {
             const accounts = await web3.eth.getAccounts();
             const item = await Amazon.methods.items(id).call();
-            const price = web3.utils.fromWei(item.cost, 'ether');
-            await Amazon.methods.buy(id, 1).send({ from: accounts[0], value: price });
+            await Amazon.methods.buy(id, 1).send({
+                from: accounts[0],
+                value: item.cost
+            });
             alert('Purchase successful');
-            loadProducts(); // Reload products to reflect the new stock count
+            loadProducts(); // Call loadProducts to refresh data after purchase
         } catch (error) {
             console.error('Purchase failed:', error);
             alert('Purchase failed, see console for details.');
@@ -80,7 +80,7 @@ const ProductPage = () => {
                         <img src={product.imageUrl || 'https://via.placeholder.com/150'} alt={product.name} />
                         <h3>{product.name}</h3>
                         <p>Category: {product.category}</p>
-                        <p>Price: {web3.utils.fromWei(product.cost, 'ether')} ETH</p>
+                        <p>Price: {product.cost} ETH</p>
                         <p>Stock: {product.stock}</p>
                         <button onClick={() => buyProduct(product.id)}>Buy</button>
                     </div>

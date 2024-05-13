@@ -6,7 +6,7 @@ import AmazonArtifact from '/build/contracts/Amazon.json';
 let web3;
 let Amazon;
 
-const contractAddress = "0x2AC70dDFB6f720c780FD6A834Ad0f3B7CD73d2D4";
+const contractAddress = "0x676a206b9674bb6f115bA439699B7c5A3baf860a";
 
 const initializeWeb3 = () => {
   return new Promise((resolve, reject) => {

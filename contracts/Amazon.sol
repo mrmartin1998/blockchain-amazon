@@ -28,25 +28,40 @@ contract Amazon {
 
     mapping(uint256 => Item) public items;
     mapping(address => bool) public isSeller;
-    mapping(address => uint256[]) public orders;
     mapping(address => ShippingInfo) public shippingInfo;
 
     event ItemListed(
-        uint256 indexed itemId, 
-        string name, 
-        string imageUrl, 
-        uint256 cost, 
-        uint256 stock, 
-        address indexed seller, 
-        string manufacturer, 
-        string dimensions, 
+        uint256 indexed itemId,
+        string name,
+        string imageUrl,
+        uint256 cost,
+        uint256 stock,
+        address indexed seller,
+        string manufacturer,
+        string dimensions,
         uint256 weight
     );
-    event ItemPurchased(address indexed buyer, uint256 itemId, uint256 quantity);
-    event ShippingInfoUpdated(address indexed user, string name, string street, string city, string postalCode, string country);
+    event ItemPurchased(
+        uint256 indexed itemId,
+        uint256 quantity,
+        address indexed buyer
+    );
+    event ShippingInfoUpdated(
+        string name,
+        string street,
+        string city,
+        string postalCode,
+        string country,
+        address indexed user
+    );
     event ItemDeleted(uint256 indexed itemId);
-    event SellerAdded(address seller);
-    event SellerRemoved(address seller);
+    event SellerAdded(address indexed seller);
+    event SellerRemoved(address indexed seller);
+
+    constructor() {
+        owner = msg.sender;
+        isSeller[owner] = true;
+    }
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only the owner can perform this action.");
@@ -56,11 +71,6 @@ contract Amazon {
     modifier onlySeller() {
         require(isSeller[msg.sender], "Only approved sellers can perform this action.");
         _;
-    }
-
-    constructor() {
-        owner = msg.sender;
-        isSeller[owner] = true;
     }
 
     function addSeller(address _seller) public onlyOwner {
@@ -77,15 +87,14 @@ contract Amazon {
         string memory _name,
         string memory _category,
         string memory _imageUrl,
-        uint256 _costWei,
+        uint256 _costWei,  // Directly use cost in Wei
         uint256 _stock,
         string memory _manufacturer,
         string memory _dimensions,
         uint256 _weight
         ) public onlySeller {
-            uint256 newItemId = itemCount++;
-            items[newItemId] = Item(
-                newItemId,
+            items[itemCount] = Item(
+                itemCount,
                 _name,
                 _category,
                 _imageUrl,
@@ -97,33 +106,53 @@ contract Amazon {
                 _weight
             );
             emit ItemListed(
-                newItemId, 
-                _name, 
-                _imageUrl, 
-                _costWei, 
-                _stock, 
-                msg.sender, 
-                _manufacturer, 
-                _dimensions, 
+                itemCount,
+                _name,
+                _imageUrl,
+                _costWei,
+                _stock,
+                msg.sender,
+                _manufacturer,
+                _dimensions,
                 _weight
             );
+            itemCount++;
     }
 
     function buy(uint256 _id, uint256 _quantity) public payable {
-        require(_id > 0 && _id < itemCount, "Item does not exist");
+        require(_id < itemCount, "Item does not exist.");
+        require(_quantity > 0, "Quantity must be greater than zero.");
         Item storage item = items[_id];
-        require(msg.value >= item.cost * _quantity, "Not enough ether sent");
-        require(item.stock >= _quantity, "Not enough items in stock");
-
+        uint256 totalCost = item.cost * _quantity;
+        require(msg.value >= totalCost, "Not enough ether sent.");
+        require(item.stock >= _quantity, "Not enough items in stock.");
         item.stock -= _quantity;
-        orders[msg.sender].push(_id);
         item.seller.transfer(msg.value);
-        emit ItemPurchased(msg.sender, _id, _quantity);
+        emit ItemPurchased(_id, _quantity, msg.sender);
     }
 
-    function setShippingInfo(string memory _name, string memory _street, string memory _city, string memory _postalCode, string memory _country) public {
-        shippingInfo[msg.sender] = ShippingInfo(_name, _street, _city, _postalCode, _country);
-        emit ShippingInfoUpdated(msg.sender, _name, _street, _city, _postalCode, _country);
+    function setShippingInfo(
+        string memory _name,
+        string memory _street,
+        string memory _city,
+        string memory _postalCode,
+        string memory _country
+    ) public {
+        shippingInfo[msg.sender] = ShippingInfo(
+            _name, 
+            _street, 
+            _city, 
+            _postalCode, 
+            _country
+        );
+        emit ShippingInfoUpdated(
+            _name, 
+            _street, 
+            _city, 
+            _postalCode, 
+            _country, 
+            msg.sender
+        );
     }
 
     function getShippingInfo(address _user) public view returns (ShippingInfo memory) {
@@ -132,12 +161,15 @@ contract Amazon {
 
     function withdraw() public onlyOwner {
         uint256 balance = address(this).balance;
-        require(balance > 0, "Balance is 0");
+        require(balance > 0, "Balance is 0.");
         payable(owner).transfer(balance);
     }
 
     function deleteItem(uint256 itemId) public onlyOwner {
-        require(items[itemId].seller == msg.sender || msg.sender == owner, "Unauthorized");
+        require(
+            items[itemId].seller == msg.sender || msg.sender == owner,
+            "Unauthorized."
+        );
         delete items[itemId];
         emit ItemDeleted(itemId);
     }
