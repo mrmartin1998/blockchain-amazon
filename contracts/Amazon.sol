@@ -87,7 +87,7 @@ contract Amazon {
         string memory _name,
         string memory _category,
         string memory _imageUrl,
-        uint256 _costWei,  // Directly use cost in Wei
+        uint256 _costWei,
         uint256 _stock,
         string memory _manufacturer,
         string memory _dimensions,

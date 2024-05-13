@@ -7,11 +7,38 @@ const ProductPage = () => {
     const [products, setProducts] = useState([]);
     const [initialized, setInitialized] = useState(false);
 
+    const loadProducts = async () => {
+        if (initialized) {
+            try {
+                const count = await Amazon.methods.itemCount().call();
+                console.log("Total products:", count.toString());
+                let loadedProducts = [];
+
+                for (let i = 1; i < count; i++) {
+                    const item = await Amazon.methods.items(i).call();
+                    if (item && item.id.toString() !== "0") {
+                        loadedProducts.push({
+                            id: item.id,
+                            name: item.name,
+                            imageUrl: item.imageUrl || 'https://via.placeholder.com/150',
+                            category: item.category,
+                            cost: web3.utils.fromWei(item.cost, 'ether'),
+                            stock: item.stock
+                        });
+                    }
+                }
+                setProducts(loadedProducts);
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+    };
+
     useEffect(() => {
         async function init() {
             try {
-                const { Amazon } = await initializeWeb3();
-                if (Amazon) {
+                const initialized = await initializeWeb3();
+                if (initialized && Amazon) {
                     console.log("Contract initialized and web3 is ready.");
                     setInitialized(true);
                 } else {
@@ -25,33 +52,6 @@ const ProductPage = () => {
     }, []);
 
     useEffect(() => {
-        async function loadProducts() {
-            if (initialized) {
-                try {
-                    const count = await Amazon.methods.itemCount().call();
-                    console.log("Total products:", count.toString());
-                    let loadedProducts = [];
-
-                    for (let i = 1; i < count; i++) {
-                        const item = await Amazon.methods.items(i).call();
-                        console.log(`Item ${i}:`, item);
-                        if (item && item.id.toString() !== "0" && item.cost.toString() !== "0") {
-                            loadedProducts.push({
-                                id: item.id,
-                                name: item.name,
-                                imageUrl: item.imageUrl || 'https://via.placeholder.com/150',
-                                category: item.category,
-                                cost: web3.utils.fromWei(item.cost, 'ether'),
-                                stock: item.stock
-                            });
-                        }
-                    }
-                    setProducts(loadedProducts);
-                } catch (error) {
-                    console.error('Error loading products:', error);
-                }
-            }
-        }
         loadProducts();
     }, [initialized]);
 
@@ -64,7 +64,7 @@ const ProductPage = () => {
                 value: item.cost
             });
             alert('Purchase successful');
-            loadProducts(); // Call loadProducts to refresh data after purchase
+            loadProducts();
         } catch (error) {
             console.error('Purchase failed:', error);
             alert('Purchase failed, see console for details.');
