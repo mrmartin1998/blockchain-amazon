@@ -16,17 +16,20 @@ const ProductPage = () => {
 
                 for (let i = 1; i < count; i++) {
                     const item = await Amazon.methods.items(i).call();
+                    console.log(`Item ${i}:`, item);
+
                     if (item && item.id.toString() !== "0") {
                         loadedProducts.push({
-                            id: item.id,
+                            id: item.id.toString(),
                             name: item.name,
                             imageUrl: item.imageUrl || 'https://via.placeholder.com/150',
                             category: item.category,
                             cost: web3.utils.fromWei(item.cost, 'ether'),
-                            stock: item.stock
+                            stock: item.stock.toString()
                         });
                     }
                 }
+                console.log("Loaded products:", loadedProducts);
                 setProducts(loadedProducts);
             } catch (error) {
                 console.error('Error loading products:', error);
