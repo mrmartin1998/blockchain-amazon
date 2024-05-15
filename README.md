@@ -39,24 +39,20 @@ Welcome to **Blockchain Amazon**, a decentralized e-commerce platform built on t
 ### Smart Contracts
 
 The core of the Blockchain Amazon DApp is the `Amazon` smart contract. It manages the marketplace functionality, including item listing, purchasing, and order tracking. Key functionalities include:
-- Listing items for sale by approved sellers.
-- Purchasing items and handling payments.
-- Maintaining an order history.
-- Managing shipping information.
+- **Item Listing**: Sellers can list items for sale by approved sellers.
+- **Item Purchasing**: Users can purchase listed items and handle payments securely.
+- **Order History**: Orders are tracked and associated with users.
+- **Shipping Information**: Users can set and retrieve shipping information.
 
 ### Frontend Implementation
 
 The frontend is built using React.js and Next.js, with Tailwind CSS and DaisyUI for styling. It interacts with the smart contract to display item listings, handle user authentication, and manage orders.
 
-### Order History Page
-
-The `OrderHistoryPage` component displays the order history of a user, fetching details from the blockchain and showing comprehensive information about each order.
-
 ## How to Run the Project
 
 1. **Clone the Repository**:
     ```sh
-    git clone https://github.com/your-username/blockchain-amazon.git
+    git clone https://github.com/mrmartin1998/blockchain-amazon.git
     cd blockchain-amazon
     ```
 
@@ -96,5 +92,5 @@ This project demonstrates my ability to develop a full-stack decentralized appli
 **Contact Information:**
 
 - **Email**: martinemilbrabenec@gmail.com
-- **LinkedIn**: https://www.linkedin.com/in/martin-emil-brabenec-33b818148/
-- **GitHub**: https://github.com/mrmartin1998/
+- **LinkedIn**: [Martin Emil Brabenec](https://www.linkedin.com/in/martin-emil-brabenec-33b818148/)
+- **GitHub**: [mrmartin1998](https://github.com/mrmartin1998/)
