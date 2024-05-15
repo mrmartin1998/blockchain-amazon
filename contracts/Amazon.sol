@@ -39,7 +39,7 @@ contract Amazon {
     mapping(address => ShippingInfo) public shippingInfo;
 
     event ItemListed(uint256 indexed itemId, string name, string imageUrl, uint256 cost, uint256 stock, address indexed seller, string manufacturer, string dimensions, uint256 weight);
-    event ItemPurchased(uint256 indexed orderId, uint256 indexed itemId, uint256 quantity, address indexed buyer);
+    event ItemPurchased(uint256 indexed orderId, uint256 indexed itemId, string itemName, string itemCategory, string itemImageUrl, uint256 itemCost, uint256 quantity, address indexed buyer);
     event ShippingInfoUpdated(string name, string street, string city, string postalCode, string country, address indexed user);
     event ItemDeleted(uint256 indexed itemId);
     event SellerAdded(address indexed seller);
@@ -91,9 +91,9 @@ contract Amazon {
         orderDetails[orderId] = Order(orderId, _itemId, _quantity);
 
         emit OrderCreated(orderId, msg.sender);  // Emit the order creation event
+        emit ItemPurchased(orderId, _itemId, item.name, item.category, item.imageUrl, item.cost, _quantity, msg.sender);  // Emit more details with the purchase event
         
         item.seller.transfer(msg.value);
-        emit ItemPurchased(orderId, _itemId, _quantity, msg.sender);
     }
 
     function setShippingInfo(string memory _name, string memory _street, string memory _city, string memory _postalCode, string memory _country) public {

@@ -7,7 +7,7 @@ let web3 = null;
 let Amazon = null;
 let initializationPromise = null;
 
-const contractAddress = "0x7C3a1c86D13E5a252f305016298EB0F11A8E4b55";
+const contractAddress = "0x471ABF0e77D49E2d7eD1e54A194feDbdf04ae8c7";
 
 function initializeWeb3() {
   if (!initializationPromise) {
