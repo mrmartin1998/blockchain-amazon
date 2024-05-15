@@ -3,37 +3,33 @@
 import Web3 from 'web3';
 import AmazonArtifact from '/build/contracts/Amazon.json';
 
-let web3;
-let Amazon;
+let web3 = null;
+let Amazon = null;
+let initializationPromise = null;
 
-const contractAddress = "0xbDfAf0388eC35832583B5fA75A7A154147a5d520";
+const contractAddress = "0x7C3a1c86D13E5a252f305016298EB0F11A8E4b55";
 
-const initializeWeb3 = () => {
-  return new Promise((resolve, reject) => {
-    if (typeof window !== 'undefined') {
-      if (window.ethereum) {
-        window.ethereum.request({ method: 'eth_requestAccounts' })
-          .then((accounts) => {
-            web3 = new Web3(window.ethereum);
-            Amazon = new web3.eth.Contract(AmazonArtifact.abi, contractAddress);
-            console.log(`Account detected and connected: ${accounts[0]}`);
-            console.log('Smart contract is ready to interact with.');
-            resolve({ web3, Amazon });
-          })
-          .catch((error) => {
-            console.error('User denied account access', error);
-            reject(error);
-          });
-      } else if (window.web3) {
-        web3 = new Web3(window.web3.currentProvider);
-        Amazon = new web3.eth.Contract(AmazonArtifact.abi, contractAddress);
-        resolve({ web3, Amazon });
-      } else {
-        console.error('No Ethereum browser extension detected.');
-        reject('No Ethereum browser extension detected.');
+function initializeWeb3() {
+  if (!initializationPromise) {
+    initializationPromise = (async () => {
+      if (typeof window !== 'undefined') {
+        if (window.ethereum) {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          web3 = new Web3(window.ethereum);
+          Amazon = new web3.eth.Contract(AmazonArtifact.abi, contractAddress);
+          console.log(`Account detected and connected: ${await web3.eth.getAccounts()[0]}`);
+          console.log('Smart contract is ready to interact with.');
+        } else if (window.web3) {
+          web3 = new Web3(window.web3.currentProvider);
+          Amazon = new web3.eth.Contract(AmazonArtifact.abi, contractAddress);
+          console.log('Using old web3 provider.');
+        } else {
+          throw new Error('No Ethereum browser extension detected.');
+        }
       }
-    }
-  });
+    })();
+  }
+  return initializationPromise;
 }
 
 export { web3, Amazon, initializeWeb3 };

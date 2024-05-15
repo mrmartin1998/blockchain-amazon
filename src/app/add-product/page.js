@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import '../globals.css';
 import { web3, Amazon } from '../utils/web3';
 
-export default function AddProduct() {
+const AddProduct = () => {
     const [product, setProduct] = useState({
         name: '',
         category: '',
@@ -26,22 +26,20 @@ export default function AddProduct() {
     };
 
     const uploadImage = async (file) => {
-        return "https://via.placeholder.com/150";
+        return "https://via.placeholder.com/150";  // Placeholder for actual image upload logic
     };
 
     const addProduct = async (e) => {
         e.preventDefault();
-        
         const imageUrl = await uploadImage(product.image);
         const costInWei = web3.utils.toWei(product.cost, 'ether');
-    
+
         try {
             const accounts = await web3.eth.getAccounts();
             if (!await Amazon.methods.isSeller(accounts[0]).call()) {
                 setResponseMessage("You are not authorized to list products.");
                 return;
             }
-            
             await Amazon.methods.list(
                 product.name,
                 product.category,
@@ -52,7 +50,6 @@ export default function AddProduct() {
                 product.dimensions,
                 product.weight
             ).send({ from: accounts[0] });
-            
             setResponseMessage('Product added successfully!');
         } catch (error) {
             console.error('Error while adding product:', error);
@@ -77,4 +74,6 @@ export default function AddProduct() {
             </form>
         </div>
     );
-}
+};
+
+export default AddProduct;
